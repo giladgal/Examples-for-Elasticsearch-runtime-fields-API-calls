@@ -1,0 +1,45 @@
+PUT _index_template/my_dynamic_index
+{
+  "index_patterns": [
+    "my_dynamic_index-*"
+  ],
+  "template": {
+    "mappings": {
+      "dynamic": "runtime",
+      "properties": {
+        "timestamp": {
+          "type": "date",
+          "format": "yyyy-MM-dd"
+        },
+        "response_code": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}
+
+GET my_dynamic_index-1/_mapping
+
+POST my_dynamic_index-1/_bulk
+{"index":{}}
+{"timestamp": "2021-01-01", "response_code": 200, "new_tla": "data-1"}
+{"index":{}}
+{"timestamp": "2021-01-01", "response_code": 200, "new_tla": "data-1"}
+{"index":{}}
+{"timestamp": "2021-01-01", "response_code": 200, "new_tla": "data-2"}
+{"index":{}}
+{"timestamp": "2021-01-01", "response_code": 200, "new_tla": "data-2"}
+
+GET my_dynamic_index-1/_search
+{
+  "query": {
+    "match": {
+      "new_tla": "data-2"
+    }
+  }
+}
+
+
+DELETE my_dynamic_index-1
+DELETE _index_template/my_dynamic_index
